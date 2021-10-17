@@ -67,6 +67,14 @@ export default function ProfileScreen({ navigation, route }: Props) {
     loadPersonalHistory(id);
   }, []);
 
+  const onPressBack = () => navigation.goBack();
+  const onPressEdit = () => {
+    // TODO
+  };
+  const onPressMenu = () => {
+    // TODO
+  };
+
   if (!profile || !history) return <Text> Loading...</Text>;
 
   return (
@@ -74,26 +82,32 @@ export default function ProfileScreen({ navigation, route }: Props) {
       <View style={styles.top}>
         <View style={styles.header}>
           <View style={styles.header_icons}>
-            <FontAwesome
-              style={styles.header_icon}
-              name="angle-left"
-              size={30}
-              color="black"
-            />
+            <Pressable onPress={onPressBack}>
+              <FontAwesome
+                style={styles.header_icon}
+                name="angle-left"
+                size={30}
+                color="black"
+              />
+            </Pressable>
           </View>
           <View style={styles.header_icons}>
-            <FontAwesome
-              style={styles.header_icon}
-              name="edit"
-              size={30}
-              color="black"
-            />
-            <FontAwesome
-              style={styles.header_icon}
-              name="ellipsis-v"
-              size={30}
-              color="black"
-            />
+            <Pressable onPress={onPressEdit}>
+              <FontAwesome
+                style={styles.header_icon}
+                name="edit"
+                size={26}
+                color="black"
+              />
+            </Pressable>
+            <Pressable onPress={onPressMenu}>
+              <FontAwesome
+                style={styles.header_icon}
+                name="ellipsis-v"
+                size={26}
+                color="black"
+              />
+            </Pressable>
           </View>
         </View>
         <View style={styles.profile}>
@@ -177,7 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   header_icon: {
-    marginHorizontal: 7,
+    marginHorizontal: 10,
   },
   profile: {
     alignItems: "center",

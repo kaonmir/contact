@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { theme } from "../../color";
 import {
   Profile,
@@ -17,30 +24,47 @@ const atoz = Array.from({ length: 26 }, (_, i) =>
   String.fromCharCode("A".charCodeAt(0) + i)
 );
 
+type T = [string, SimpleProfiles];
 type Props = NativeStackScreenProps<RootStackParamList, "Phone">;
 
 export default function PhoneScreen({ navigation }: Props) {
-  const [value, setValue] = useState("");
-  const [profiles, setProfiles] = useState<{ [a: string]: SimpleProfiles }>({}); // A: [profiles~]
+  const [profiles, setProfiles] = useState<SimpleProfile[]>([]); // A: [profiles~]
+  const [search, setSearch] = useState("");
 
-  const loadProfiles = () => {
-    const newProfiles: { [a: string]: SimpleProfiles } = {};
-
-    atoz.forEach((a) => {
-      newProfiles[a] = ProfileModel.loadSimpleProfiles()
-        .filter(({ full_name }) => full_name[0] === a)
-        .sort((A, B) => A.full_name.localeCompare(B.full_name));
-    });
-    setProfiles(newProfiles);
-  };
+  const loadProfiles = () => setProfiles(ProfileModel.loadSimpleProfiles());
 
   useEffect(() => loadProfiles(), []);
 
-  const onPressProfile = (profile: SimpleProfile) => {
-    navigation.navigate("Profile", { id: profile.id });
+  const formatProfile = (inputProfiles: SimpleProfiles): T[] => {
+    const newProfiles = atoz
+      .map((a): T => {
+        const newPs = inputProfiles
+          .filter(({ full_name }) => full_name[0] === a)
+          .filter(filterSearch)
+          .sort((A, B) => A.full_name.localeCompare(B.full_name));
+        return [a, newPs];
+      })
+      .filter(([_, ps]) => ps.length !== 0);
+    return newProfiles;
   };
 
-  if (profiles === {}) return <Text> Loading...</Text>;
+  const filterSearch = ({ full_name, title, tags }: SimpleProfile): boolean => {
+    const tolc = (s: string) => s.toLocaleLowerCase();
+    if (
+      search === "" ||
+      tolc(full_name).includes(tolc(search)) ||
+      tolc(title).includes(tolc(search)) ||
+      tags.some((tag) => tolc(tag).includes(tolc(search)))
+    )
+      return true;
+    else return false;
+  };
+
+  const onPressProfile = (id: number) => {
+    navigation.navigate("Profile", { id });
+  };
+
+  if (profiles === []) return <Text> Loading...</Text>;
 
   return (
     <View style={styles.container}>
@@ -49,30 +73,28 @@ export default function PhoneScreen({ navigation }: Props) {
         <TextInput
           style={styles.header_textinput}
           placeholder="Search Content"
-          onChangeText={setValue}
-          value={value}
+          onChangeText={setSearch}
+          value={search}
         />
       </View>
       <ScrollView style={styles.body}>
-        {atoz
-          .filter((a) => profiles[a] && profiles[a].length !== 0)
-          .map((a, idx) => (
-            <View style={styles.box} key={idx}>
-              <Text style={styles.alphabet}> {a} </Text>
-              <View>
-                {profiles[a].map((profile, idx) => (
+        {formatProfile(profiles).map(([a, ps], idx) => (
+          <View style={styles.box} key={idx}>
+            <Text style={styles.alphabet}> {a} </Text>
+            <View>
+              {ps.map((profile, idx) => (
+                <Pressable key={idx} onPress={() => onPressProfile(profile.id)}>
                   <SimpleProfileComp
-                    key={idx}
                     image={profile.image}
                     name={`${profile.title} ${profile.full_name}`}
                     content={profile.content}
                     tags={profile.tags}
-                    onPress={() => onPressProfile(profile)}
                   />
-                ))}
-              </View>
+                </Pressable>
+              ))}
             </View>
-          ))}
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
