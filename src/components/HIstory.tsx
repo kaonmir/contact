@@ -91,10 +91,10 @@ const styles = StyleSheet.create({
   },
   message: {
     flex: 1,
-    backgroundColor: theme.grey200,
+    backgroundColor: theme.grey100,
     borderRadius: 6,
     paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingVertical: 5,
   },
   message_content: {
     fontSize: 11,

@@ -19,6 +19,7 @@ import Tag from "../components/Tag";
 import Contact from "../components/Contact";
 import { Icon } from "../components/Icon";
 import History from "../components/HIstory";
+import { Button, Divider, Menu, Provider } from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
 
@@ -26,6 +27,8 @@ export default function ProfileScreen({ navigation, route }: Props) {
   const [profile, setProfile] = useState<Profile>();
   const [isDetail, setIsDetail] = useState(true);
   const [history, setHistory] = useState<Record<string, PersonalHistory[]>>({});
+  const [scroller, setScroller] = useState<ScrollView | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const loadProfile = (id: number) => setProfile(ProfileModel.getProfile(id));
   const loadPersonalHistory = (id: number) => {
@@ -67,6 +70,11 @@ export default function ProfileScreen({ navigation, route }: Props) {
     loadPersonalHistory(id);
   }, []);
 
+  const onClickBottomHeader = (_isDetail: boolean) => {
+    setIsDetail(_isDetail);
+    scroller?.scrollTo();
+  };
+
   const onPressBack = () => navigation.goBack();
   const onPressEdit = () => {
     // TODO
@@ -78,92 +86,105 @@ export default function ProfileScreen({ navigation, route }: Props) {
   if (!profile || !history) return <Text> Loading...</Text>;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <View style={styles.header}>
-          <View style={styles.header_icons}>
-            <Pressable onPress={onPressBack}>
-              <FontAwesome
-                style={styles.header_icon}
-                name="angle-left"
-                size={30}
-                color="black"
-              />
-            </Pressable>
+    <Provider>
+      <View style={styles.container}>
+        <View style={styles.top}>
+          <View style={styles.header}>
+            <View style={styles.header_icons}>
+              <Pressable onPress={onPressBack}>
+                <FontAwesome
+                  style={styles.header_icon}
+                  name="angle-left"
+                  size={30}
+                  color="black"
+                />
+              </Pressable>
+            </View>
+            <View style={styles.header_icons}>
+              <Pressable onPress={onPressEdit}>
+                <FontAwesome
+                  style={styles.header_icon}
+                  name="edit"
+                  size={26}
+                  color="black"
+                />
+              </Pressable>
+              <Menu
+                visible={menuVisible}
+                onDismiss={() => setMenuVisible(false)}
+                anchor={
+                  <Pressable onPress={() => setMenuVisible(true)}>
+                    <FontAwesome
+                      style={styles.header_icon}
+                      name="ellipsis-v"
+                      size={26}
+                      color="black"
+                    />
+                  </Pressable>
+                }
+              >
+                <Menu.Item onPress={() => {}} title="Share" />
+                <Menu.Item onPress={() => {}} title="Delete" />
+              </Menu>
+            </View>
           </View>
-          <View style={styles.header_icons}>
-            <Pressable onPress={onPressEdit}>
-              <FontAwesome
-                style={styles.header_icon}
-                name="edit"
-                size={26}
-                color="black"
-              />
-            </Pressable>
-            <Pressable onPress={onPressMenu}>
-              <FontAwesome
-                style={styles.header_icon}
-                name="ellipsis-v"
-                size={26}
-                color="black"
-              />
-            </Pressable>
-          </View>
-        </View>
-        <View style={styles.profile}>
-          <Image style={styles.profile_image} source={profile.image} />
-          <Text
-            style={styles.profile_name}
-          >{`${profile.title} ${profile.full_name}`}</Text>
-          <View style={styles.profile_tags}>
-            {profile.tags.map((tag, idx) => (
-              <Tag key={idx} name={tag} />
-            ))}
-          </View>
-        </View>
-      </View>
-      <View style={styles_bottom.container}>
-        <View style={styles_bottom.header}>
-          <Pressable onPress={() => setIsDetail(true)}>
+          <View style={styles.profile}>
+            <Image style={styles.profile_image} source={profile.image} />
             <Text
-              style={
-                isDetail
-                  ? styles_bottom.header_text_pressed
-                  : styles_bottom.header_text
-              }
-            >
-              Details
-            </Text>
-          </Pressable>
-          <Pressable onPress={() => setIsDetail(false)}>
-            <Text
-              style={
-                !isDetail
-                  ? styles_bottom.header_text_pressed
-                  : styles_bottom.header_text
-              }
-            >
-              History
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles_bottom.body}>
-          {isDetail
-            ? profile.contacts.map((props, idx) => (
-                <Contact key={idx} {...props} />
-              ))
-            : Object.entries(history).map(([date, historyList], idx) => (
-                <View key={idx} style={styles_bottom.box}>
-                  <Text style={styles_bottom.date}>{getDateFormat(date)}</Text>
-                  {historyList.map((h, idx) => (
-                    <History key={idx} history={h} />
-                  ))}
-                </View>
+              style={styles.profile_name}
+            >{`${profile.title} ${profile.full_name}`}</Text>
+            <View style={styles.profile_tags}>
+              {profile.tags.map((tag, idx) => (
+                <Tag key={idx} name={tag} />
               ))}
+            </View>
+          </View>
+        </View>
+        <View style={styles_bottom.container}>
+          <View style={styles_bottom.header}>
+            <Pressable onPress={() => onClickBottomHeader(true)}>
+              <Text
+                style={
+                  isDetail
+                    ? styles_bottom.header_text_pressed
+                    : styles_bottom.header_text
+                }
+              >
+                Details
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => onClickBottomHeader(false)}>
+              <Text
+                style={
+                  !isDetail
+                    ? styles_bottom.header_text_pressed
+                    : styles_bottom.header_text
+                }
+              >
+                History
+              </Text>
+            </Pressable>
+          </View>
+
+          <ScrollView style={styles_bottom.body} ref={setScroller}>
+            {isDetail
+              ? profile.contacts.map((props, idx) => (
+                  <Contact key={idx} {...props} />
+                ))
+              : Object.entries(history).map(([date, historyList], idx) => (
+                  <View key={idx} style={styles_bottom.box}>
+                    <Text style={styles_bottom.date}>
+                      {getDateFormat(date)}
+                    </Text>
+                    {historyList.map((h, idx) => (
+                      <History key={idx} history={h} />
+                    ))}
+                  </View>
+                ))}
+          </ScrollView>
         </View>
       </View>
-    </View>
+    </Provider>
   );
 }
 
