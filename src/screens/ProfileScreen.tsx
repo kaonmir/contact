@@ -77,8 +77,11 @@ export default function ProfileScreen({ navigation, route }: Props) {
   const onPressEdit = () => {
     // TODO
   };
-  const onPressMenu = () => {
-    // TODO
+  const onPressMenu = (value: "Delete" | "Share") => {
+    if (value === "Delete") {
+    } else if (value === "Share") {
+    }
+    setMenuVisible(false);
   };
   const onPressTag = (tag: string) => navigation.push("Phone", { tag });
 
@@ -122,8 +125,11 @@ export default function ProfileScreen({ navigation, route }: Props) {
                   </Pressable>
                 }
               >
-                <Menu.Item onPress={() => {}} title="Share" />
-                <Menu.Item onPress={() => {}} title="Delete" />
+                <Menu.Item onPress={() => onPressMenu("Share")} title="Share" />
+                <Menu.Item
+                  onPress={() => onPressMenu("Delete")}
+                  title="Delete"
+                />
               </Menu>
             </View>
           </View>
@@ -206,8 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
 
     paddingHorizontal: 20,
-    paddingTop: 46,
-    paddingVertical: 6,
+    paddingTop: 40,
   },
   header_icons: {
     flexDirection: "row",
@@ -217,7 +222,6 @@ const styles = StyleSheet.create({
   },
   profile: {
     alignItems: "center",
-    marginTop: 13,
   },
   profile_image: {
     width: 80,

@@ -78,6 +78,8 @@ export default function PhoneScreen({ route, navigation }: Props) {
     }
   };
   const onPressSubmitKey = () => onPressKey("Enter");
+  const onPressTag = (index: number) =>
+    setTags(tags.filter((_, idx) => idx !== index));
 
   if (profiles === []) return <Text> Loading...</Text>;
 
@@ -86,9 +88,9 @@ export default function PhoneScreen({ route, navigation }: Props) {
       <View style={styles.header}>
         <FontAwesome name="search" size={20} color={theme.grey400} />
         {tags.map((name, idx) => (
-          <Text key={idx} style={styles.tag}>
-            {name}
-          </Text>
+          <Pressable key={idx} onPress={() => onPressTag(idx)}>
+            <Text style={styles.tag}>{name}</Text>
+          </Pressable>
         ))}
         <TextInput
           style={styles.header_textinput}
