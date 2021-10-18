@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import {
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TextInputKeyPressEventData,
+  TextInputSubmitEditingEventData,
   View,
 } from "react-native";
 import { theme } from "../../color";
@@ -30,7 +33,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Phone">;
 export default function PhoneScreen({ navigation }: Props) {
   const [profiles, setProfiles] = useState<SimpleProfile[]>([]); // A: [profiles~]
   const [search, setSearch] = useState("");
-  const [tags, setTags] = useState<string[]>(["sfsdfaadsdfo"]);
+  const [tags, setTags] = useState<string[]>(["dfs"]);
 
   const loadProfiles = () => setProfiles(ProfileModel.loadSimpleProfiles());
 
@@ -49,19 +52,26 @@ export default function PhoneScreen({ navigation }: Props) {
     return newProfiles;
   };
 
+  function insertTag(text: string) {
+    const keyword = text.trim();
+    setTags([...tags, keyword]);
+    setSearch("");
+  }
+
   const onPressProfile = (id: number) => navigation.navigate("Profile", { id });
   const onChangeSearchText = (text: string) => {
-    if (!isBlank(text) && text[text.length - 1] === " ") {
-      const keyword = text.trim();
-      setTags([...tags, keyword]);
-      setSearch("");
-    } else setSearch(text);
+    if (!isBlank(text) && text[text.length - 1] === " ") insertTag(text);
+    else setSearch(text);
   };
-  const onPressBackKey = () => {
-    if (search === "" && tags.length !== 0) {
-      setTags(tags.slice(0, tags.length - 1));
+  const onPressKey = (key: string) => {
+    if (key === "Backspace") {
+      if (search === "" && tags.length !== 0)
+        setTags(tags.slice(0, tags.length - 1));
+    } else if (key === "Enter") {
+      if (search.trim() !== "") insertTag(search);
     }
   };
+  const onPressSubmitKey = () => onPressKey("Enter");
 
   if (profiles === []) return <Text> Loading...</Text>;
 
@@ -70,15 +80,14 @@ export default function PhoneScreen({ navigation }: Props) {
       <View style={styles.header}>
         <FontAwesome name="search" size={20} color={theme.grey400} />
         {tags.map((name, idx) => (
-          <Tag key={idx} name={name} />
+          <Tag key={idx} name={name} bgcolor={theme.grey500} />
         ))}
         <TextInput
           style={styles.header_textinput}
           placeholder="Search Content"
           onChangeText={onChangeSearchText}
-          onKeyPress={(e) =>
-            e.nativeEvent.key === "Backspace" ? onPressBackKey() : null
-          }
+          onKeyPress={({ nativeEvent: { key } }) => onPressKey(key)}
+          onSubmitEditing={onPressSubmitKey}
           value={search}
         />
       </View>
