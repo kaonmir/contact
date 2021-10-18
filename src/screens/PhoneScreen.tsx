@@ -16,10 +16,13 @@ import SimpleProfileComp from "../components/SimpleProfile";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from ".";
 import { IconButton } from "react-native-paper";
+import searchContact from "../services/SearchContact";
+import Tag from "../components/Tag";
 
 const atoz = Array.from({ length: 26 }, (_, i) =>
   String.fromCharCode("A".charCodeAt(0) + i)
 );
+const isBlank = (text: string) => new RegExp(/^ +$/).test(text);
 
 type T = [string, SimpleProfiles];
 type Props = NativeStackScreenProps<RootStackParamList, "Phone">;
@@ -27,6 +30,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Phone">;
 export default function PhoneScreen({ navigation }: Props) {
   const [profiles, setProfiles] = useState<SimpleProfile[]>([]); // A: [profiles~]
   const [search, setSearch] = useState("");
+  const [tags, setTags] = useState<string[]>(["sfsdfaadsdfo"]);
 
   const loadProfiles = () => setProfiles(ProfileModel.loadSimpleProfiles());
 
@@ -37,7 +41,7 @@ export default function PhoneScreen({ navigation }: Props) {
       .map((a): T => {
         const newPs = inputProfiles
           .filter(({ full_name }) => full_name[0] === a)
-          .filter(filterSearch)
+          .filter((profile) => searchContact(tags, profile))
           .sort((A, B) => A.full_name.localeCompare(B.full_name));
         return [a, newPs];
       })
@@ -45,20 +49,18 @@ export default function PhoneScreen({ navigation }: Props) {
     return newProfiles;
   };
 
-  const filterSearch = ({ full_name, title, tags }: SimpleProfile): boolean => {
-    const tolc = (s: string) => s.toLocaleLowerCase();
-    if (
-      search === "" ||
-      tolc(full_name).includes(tolc(search)) ||
-      tolc(title).includes(tolc(search)) ||
-      tags.some((tag) => tolc(tag).includes(tolc(search)))
-    )
-      return true;
-    else return false;
+  const onPressProfile = (id: number) => navigation.navigate("Profile", { id });
+  const onChangeSearchText = (text: string) => {
+    if (!isBlank(text) && text[text.length - 1] === " ") {
+      const keyword = text.trim();
+      setTags([...tags, keyword]);
+      setSearch("");
+    } else setSearch(text);
   };
-
-  const onPressProfile = (id: number) => {
-    navigation.navigate("Profile", { id });
+  const onPressBackKey = () => {
+    if (search === "" && tags.length !== 0) {
+      setTags(tags.slice(0, tags.length - 1));
+    }
   };
 
   if (profiles === []) return <Text> Loading...</Text>;
@@ -67,10 +69,16 @@ export default function PhoneScreen({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <FontAwesome name="search" size={20} color={theme.grey400} />
+        {tags.map((name, idx) => (
+          <Tag key={idx} name={name} />
+        ))}
         <TextInput
           style={styles.header_textinput}
           placeholder="Search Content"
-          onChangeText={setSearch}
+          onChangeText={onChangeSearchText}
+          onKeyPress={(e) =>
+            e.nativeEvent.key === "Backspace" ? onPressBackKey() : null
+          }
           value={search}
         />
       </View>
