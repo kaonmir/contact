@@ -74,17 +74,17 @@ export const profile: Profile = {
   full_name: "Son, Sunghun",
   contacts: [
     {
-      icon: "phone",
+      scheme: "phone",
       name: "Commercial",
       content: "+82 010-1234-5678",
     },
     {
-      icon: "phone",
+      scheme: "phone",
       name: "DSN",
       content: "315-722-6223",
     },
     {
-      icon: "email",
+      scheme: "email",
       name: "NIPR",
       content: "sunghun.son.fm@mail.mil",
     },

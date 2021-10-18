@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PersonalHistory, Profile, SimpleProfiles } from "./@types/Profile";
 import * as dummy from "./dummy";
 

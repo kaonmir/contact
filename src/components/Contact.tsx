@@ -1,30 +1,42 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { ContactType } from "../../model/@types/Profile";
 import { FontAwesome } from "@expo/vector-icons";
 import { theme } from "../../color";
 
 type Props = {
-  icon: ContactType;
+  scheme: ContactType;
   name: string;
   content: string;
 };
 
-export default function Contact({ icon, name, content }: Props) {
+export default function Contact({ scheme, name, content }: Props) {
+  const onPressContact = () => {
+    // TODO: SMS
+    const schemes: Record<ContactType, string> = {
+      email: "mailto",
+      phone: "tel",
+    };
+    const url = `${schemes[scheme]}:${content}`;
+    Linking.openURL(url);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.icon}>
-        <FontAwesome
-          name={icon === "phone" ? "phone" : "envelope"}
-          size={28}
-          color={theme.purplePrimary}
-        />
+    <Pressable onPress={onPressContact}>
+      <View style={styles.container}>
+        <View style={styles.icon}>
+          <FontAwesome
+            name={scheme === "phone" ? "phone" : "envelope"}
+            size={28}
+            color={theme.purplePrimary}
+          />
+        </View>
+        <View style={styles.body}>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.content}>{content}</Text>
+        </View>
       </View>
-      <View style={styles.body}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.content}>{content}</Text>
-      </View>
-    </View>
+    </Pressable>
   );
 }
 

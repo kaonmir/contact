@@ -9,16 +9,13 @@ import {
   View,
 } from "react-native";
 import { theme } from "../../color";
-import {
-  Profile,
-  SimpleProfile,
-  SimpleProfiles,
-} from "../../model/@types/Profile";
+import { SimpleProfile, SimpleProfiles } from "../../model/@types/Profile";
 
 import ProfileModel from "../../model/profileModel";
 import SimpleProfileComp from "../components/SimpleProfile";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from ".";
+import { IconButton } from "react-native-paper";
 
 const atoz = Array.from({ length: 26 }, (_, i) =>
   String.fromCharCode("A".charCodeAt(0) + i)
@@ -96,6 +93,12 @@ export default function PhoneScreen({ navigation }: Props) {
           </View>
         ))}
       </ScrollView>
+      <IconButton
+        icon="plus"
+        size={38}
+        color="white"
+        style={styles.create_button_icon}
+      />
     </View>
   );
 }
@@ -128,5 +131,14 @@ const styles = StyleSheet.create({
     color: "blue",
     fontSize: 14,
     marginBottom: 6,
+  },
+  create_button: {
+    backgroundColor: "cyan",
+  },
+  create_button_icon: {
+    position: "absolute",
+    right: 25,
+    bottom: 25,
+    backgroundColor: theme.purplePrimary,
   },
 });

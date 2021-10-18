@@ -1,5 +1,4 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { createStackNavigator } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -17,9 +16,8 @@ import { PersonalHistory, Profile } from "../../model/@types/Profile";
 import ProfileModel from "../../model/profileModel";
 import Tag from "../components/Tag";
 import Contact from "../components/Contact";
-import { Icon } from "../components/Icon";
 import History from "../components/HIstory";
-import { Button, Divider, Menu, Provider } from "react-native-paper";
+import { Menu, Provider } from "react-native-paper";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
 

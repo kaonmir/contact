@@ -23,7 +23,7 @@ export type Profile = {
 export type ContactType = "phone" | "email";
 
 export type Contact = {
-  icon: ContactType;
+  scheme: ContactType;
   name: string;
   content: string; // number or email
 };
