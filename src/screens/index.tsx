@@ -28,7 +28,9 @@ export const SCREENS: Record<RouteName, Screen> = {
 };
 
 export type RootStackParamList = {
-  Phone: undefined;
+  Phone: {
+    tag?: string;
+  };
   Profile: {
     id: number;
   };

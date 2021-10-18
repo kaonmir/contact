@@ -30,14 +30,20 @@ const isBlank = (text: string) => new RegExp(/^ +$/).test(text);
 type T = [string, SimpleProfiles];
 type Props = NativeStackScreenProps<RootStackParamList, "Phone">;
 
-export default function PhoneScreen({ navigation }: Props) {
+export default function PhoneScreen({ route, navigation }: Props) {
   const [profiles, setProfiles] = useState<SimpleProfile[]>([]); // A: [profiles~]
   const [search, setSearch] = useState("");
-  const [tags, setTags] = useState<string[]>(["dfs"]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const loadProfiles = () => setProfiles(ProfileModel.loadSimpleProfiles());
 
-  useEffect(() => loadProfiles(), []);
+  useEffect(() => {
+    loadProfiles();
+
+    // If the screen is navigated to search specific tag
+    const tag = route?.params?.tag;
+    if (tag !== undefined) setTags([tag]);
+  }, []);
 
   const formatProfile = (inputProfiles: SimpleProfiles): T[] => {
     const newProfiles = atoz
@@ -80,7 +86,9 @@ export default function PhoneScreen({ navigation }: Props) {
       <View style={styles.header}>
         <FontAwesome name="search" size={20} color={theme.grey400} />
         {tags.map((name, idx) => (
-          <Tag key={idx} name={name} bgcolor={theme.grey500} />
+          <Text key={idx} style={styles.tag}>
+            {name}
+          </Text>
         ))}
         <TextInput
           style={styles.header_textinput}
@@ -141,11 +149,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     paddingLeft: 10,
   },
+  tag: {
+    color: theme.grey100,
+    fontSize: 14,
+    backgroundColor: theme.grey600,
+    paddingVertical: 0.9,
+    paddingHorizontal: 5,
+    marginLeft: 5,
+    borderRadius: 8,
+  },
   body: { marginTop: 7 },
   box: { marginBottom: 5 },
   alphabet: {
     marginStart: 13,
-    color: "blue",
+    color: theme.purplePrimary,
     fontSize: 14,
     marginBottom: 6,
   },

@@ -80,6 +80,7 @@ export default function ProfileScreen({ navigation, route }: Props) {
   const onPressMenu = () => {
     // TODO
   };
+  const onPressTag = (tag: string) => navigation.push("Phone", { tag });
 
   if (!profile || !history) return <Text> Loading...</Text>;
 
@@ -133,7 +134,9 @@ export default function ProfileScreen({ navigation, route }: Props) {
             >{`${profile.title} ${profile.full_name}`}</Text>
             <View style={styles.profile_tags}>
               {profile.tags.map((tag, idx) => (
-                <Tag key={idx} name={tag} />
+                <Pressable key={idx} onPress={() => onPressTag(tag)}>
+                  <Tag name={tag} />
+                </Pressable>
               ))}
             </View>
           </View>
